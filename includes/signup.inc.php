@@ -6,7 +6,7 @@ if(isset($_POST['submit1']) === true)
     $name = mysqli_real_escape_string($sql, $_POST['name']); // input control that doesn't allow to send code to database
     $email = mysqli_real_escape_string($sql, $_POST['email']);
     $pass = mysqli_real_escape_string($sql, $_POST['pass']);
-    if(empty($name) || empty($email) || empty($pass))
+    if(empty($name) || empty($email) || empty($pass)) //all ifs check if data is correct
     {
         header("Location: ../signup.php");
         exit();
@@ -27,7 +27,7 @@ if(isset($_POST['submit1']) === true)
             }
             else
             {
-                $sqlemail = "SELECT * FROM `users` WHERE email='$email'";
+                $sqlemail = "SELECT * FROM `users` WHERE email='$email'"; // select row with email and then checks if email exist
                 $result = $sql->query($sqlemail);
                 $resultCheck = mysqli_num_rows($result);
                 if($resultCheck > 0)
@@ -37,7 +37,7 @@ if(isset($_POST['submit1']) === true)
                 }
                 else
                 {
-                    $hashedPass = password_hash($pass, PASSWORD_DEFAULT);
+                    $hashedPass = password_hash($pass, PASSWORD_DEFAULT); // if email doesn't exist then encripts password and insert to database
                     $insert = "INSERT INTO `users` (name, email, password, created_at, updated_at) VALUE('$name', '$email', '$hashedPass', NOW(), NOW() );";
                     if($sql->query($insert))
                     {

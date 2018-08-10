@@ -4,7 +4,7 @@ session_start();
 if(isset($_POST['login']) === true)
 {
     include_once dirname(__FILE__) . '/../includes/dbh.inc.php';
-    $email = mysqli_real_escape_string($sql, $_POST['email']);
+    $email = mysqli_real_escape_string($sql, $_POST['email']); // string control
     $pass = mysqli_real_escape_string($sql, $_POST['pass']);
     if(empty($email) || empty($pass))
     {
@@ -13,7 +13,7 @@ if(isset($_POST['login']) === true)
     }
     else
     {
-        $exsist = "SELECT * FROM `users` WHERE email = '$email'";
+        $exsist = "SELECT * FROM `users` WHERE email = '$email'"; // check if row with email exist then check if password is the same
         $quer = mysqli_query($sql, $exsist);
         $result = mysqli_num_rows($quer);
         if($result = 1)

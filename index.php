@@ -84,7 +84,7 @@ if(isset($_SESSION['u_email']))
 
 <script>
 
- var km = 0; // length between two cordinates
+  var km = 0; // length between two cordinates
   function getDistance(origin, destination, id1, id2)
   {
      //Find the distance
@@ -113,11 +113,11 @@ if(isset($_SESSION['u_email']))
   }
 
 function myMap() { // make map
-var mapOptions = {
-    center: new google.maps.LatLng(55.303395, 23.990905),
-    zoom: 7,
-    mapTypeId: google.maps.MapTypeId.HYBRID
-};
+        var mapOptions = {
+            center: new google.maps.LatLng(55.303395, 23.990905),
+            zoom: 7,
+            mapTypeId: google.maps.MapTypeId.HYBRID
+        };
 
         var infowindow = new google.maps.InfoWindow({ // create info window when clicks on pointer
 
@@ -125,95 +125,97 @@ var mapOptions = {
 
         var pos = {lat: 51.5, lng: -0.12};  // center of the map
         var map = new google.maps.Map(document.getElementById("map"), mapOptions);
-        // ajax request for returning data from database
+
         function updateMap() // created function for automaticly update because of database. If in database apears new record website must reload.
         {
-        var TempMarkers = [];
-        function arraysEqual(arr1, arr2) {
-        if(arr1.length !== arr2.length)
-        {
-        return false;
-        }
-        for(var i = arr1.length; i--;) {
-            if(arr1[i] !== arr2[i])
+            var TempMarkers = [];
+            function arraysEqual(arr1, arr2) {
+            if(arr1.length !== arr2.length)
             {
-                return false;
+            return false;
             }
-        }
-        return true;
-        }
-        km = 0;
-        $.ajax({
-            type: "POST",
-            url: "includes/pointer.inc.php",
-            dataType: "json",
-            cache: false,
-            success: function(result) {
-            var locations = result;
-            for (i = 0; i < locations.length; i++) {
-            for(a = 0; a < locations.length; a++)
-            {
-                if(locations.length > 1 && locations[i][2] != locations[a][2] && locations[i][3] != locations[a][3])
+            for(var i = arr1.length; i--;) {
+                if(arr1[i] !== arr2[i])
                 {
-                getDistance(locations[i][2]+","+locations[i][3],  locations[a][2]+","+locations[a][3], locations[i][0], locations[a][0]); // method to calculate max distance between two coordinates
+                    return false;
                 }
-                else if(locations.length <= 1)
-                {
-                    document.getElementById("in_kilo").innerHTML = "";
-                }
-
             }
+            return true;
+            }
+            km = 0;
+            $.ajax({
+                type: "POST",
+                url: "includes/pointer.inc.php",
+                dataType: "json",
+                cache: false,
+                success: function(result) {
+                    var locations = result;
+                    for (i = 0; i < locations.length; i++) {
+                        for(a = 0; a < locations.length; a++)
+                        {
+                            if(locations.length > 1 && locations[i][2] != locations[a][2] && locations[i][3] != locations[a][3])
+                            {
+                            getDistance(locations[i][2]+","+locations[i][3],  locations[a][2]+","+locations[a][3], locations[i][0], locations[a][0]); // method to calculate max distance between two coordinates
+                            }
+                            else if(locations.length <= 1)
+                            {
+                                document.getElementById("in_kilo").innerHTML = "";
+                            }
 
-        var marker = new google.maps.Marker({ // create new marker with database coordinates
-        position: new google.maps.LatLng(locations[i][2], locations[i][3]),
-        map: map
-        });
-        TempMarkers.push(marker);
-             google.maps.event.addListener(marker, "click", (function(marker, i) { // if pointer is clicked show data in pop up box
-            return function() {
+                        }
 
-            $.ajax({ // request for getting address
-                type: "GET",
-                url: "https://nominatim.openstreetmap.org/reverse?format=xml&lat="+locations[i][2]+"&lon="+locations[i][3]+"&zoom=18&addressdetails=1",
-                dataType: "xml",
-                success: function(adress)
-                { // if sucess add data to info box
-                var info = $(adress).find("result").text();
-                var res = info.split(",");
-                infowindow.setContent("<div>Device id: "+locations[i][0]+"</div>"+"<div>Place: "+locations[i][1]+"</div>"+"<div>Adress: "+res[0]+","+res[1]+","+res[2]+",</br>"+res[3]+","+res[4]+","+res[5]+"</div>");
-                infowindow.open(map, marker);
+                        var marker = new google.maps.Marker({ // create new marker with database coordinates
+                        position: new google.maps.LatLng(locations[i][2], locations[i][3]),
+                        map: map
+                        });
+                        TempMarkers.push(marker); // add marker to temporary array if needs to coregate
+                            google.maps.event.addListener(marker, "click", (function(marker, i) { // if pointer is clicked show data in pop up box
+                            return function() {
+
+                                $.ajax({ // request for changing coordinates to address
+                                    type: "GET",
+                                    url: "https://nominatim.openstreetmap.org/reverse?format=xml&lat="+locations[i][2]+"&lon="+locations[i][3]+"&zoom=18&addressdetails=1",
+                                    dataType: "xml",
+                                    success: function(adress)
+                                    { // if sucess add data to info box
+                                    var info = $(adress).find("result").text();
+                                    var res = info.split(",");
+                                    infowindow.setContent("<div>Device id: "+locations[i][0]+"</div>"+"<div>Place: "+locations[i][1]+"</div>"+"<div>Adress: "+res[0]+","+res[1]+","+res[2]+",</br>"+res[3]+","+res[4]+","+res[5]+"</div>");
+                                    infowindow.open(map, marker);
+                                    }
+                                });
+
+                            }
+                            })(marker, i));
+
+                    }
                 }
+
             });
-
-            }
-            })(marker, i));
-
-        }
-        }
-
-        });
         }
         updateMap();
         setInterval(updateMap, 3000);
 }
 function updateList()
 {
- $.ajax({    //create an ajax request to list.inc.php
- type: "POST",
- url: "includes/list.inc.php",
- dataType: "html",   //expect html to be returned
- success: function(response){
- $("#list").html(response); // return list from database
+     $.ajax({    //create an ajax request to list.inc.php
+     type: "POST",
+     url: "includes/list.inc.php",
+     dataType: "html",   //expect html to be returned
+     success: function(response){
+     $("#list").html(response); // return list from database
+     }
+     });
  }
- });
- }
+ 
  updateList();
-    setInterval(updateList, 3000);
+setInterval(updateList, 3000);
+
 </script> ');
     echo('<script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCVh6B0capYQNn0RvjAZ2BtWP0ck-iaw8s&callback=myMap"></script>');
 }
 echo('<script>
-function visible()
+function visible() // functions for make tip visable or hidden
 {
 document.getElementById("tooltiptext").style.visibility = "visible";
 }

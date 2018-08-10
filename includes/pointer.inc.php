@@ -12,7 +12,7 @@
         {
             $array[$count] = array(4);
             $coordinates =  preg_replace('/\s/', '', $row['Coordinates']);
-            $CoordinatesArray = explode(',', $coordinates);
+            $CoordinatesArray = explode(',', $coordinates); // make two varables for cordinates
             $array[$count][0] = $row['Device_Id'];
             $array[$count][1] = $row['Choise'];
             $array[$count][2] = $CoordinatesArray[0];
@@ -21,7 +21,7 @@
             $count++;
 
         }
-                 echo json_encode($array);
+                 echo json_encode($array); // return all data from database
 
     }
     }
