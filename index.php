@@ -112,7 +112,9 @@ if(isset($_SESSION['u_email']))
     });
   }
 
+ var markers = [];
 function myMap() { // make map
+
         var mapOptions = {
             center: new google.maps.LatLng(55.303395, 23.990905),
             zoom: 7,
@@ -128,20 +130,28 @@ function myMap() { // make map
 
         function updateMap() // created function for automaticly update because of database. If in database apears new record website must reload.
         {
-            var TempMarkers = [];
-            function arraysEqual(arr1, arr2) {
-            if(arr1.length !== arr2.length)
-            {
-            return false;
-            }
-            for(var i = arr1.length; i--;) {
-                if(arr1[i] !== arr2[i])
-                {
-                    return false;
-                }
-            }
-            return true;
-            }
+    function setMapOnAll(map) {
+        for (var i = 0; i < markers.length; i++) {
+          markers[i].setMap(map);
+        }
+      }
+
+      // Removes the markers from the map, but keeps them in the array.
+      function clearMarkers() {
+        setMapOnAll(null);
+      }
+
+      // Shows any markers currently in the array.
+      function showMarkers() {
+        setMapOnAll(map);
+      }
+
+      // Deletes all markers in the array by removing references to them.
+      function deleteMarkers() {
+        clearMarkers();
+        markers = [];
+      }
+
             km = 0;
             $.ajax({
                 type: "POST",
@@ -150,6 +160,11 @@ function myMap() { // make map
                 cache: false,
                 success: function(result) {
                     var locations = result;
+                    if(locations.length > markers.length)
+                    {
+                    deleteMarkers();
+                    markers.splice(0, locations.length);
+                    }
                     for (i = 0; i < locations.length; i++) {
                         for(a = 0; a < locations.length; a++)
                         {
@@ -168,7 +183,7 @@ function myMap() { // make map
                         position: new google.maps.LatLng(locations[i][2], locations[i][3]),
                         map: map
                         });
-                        TempMarkers.push(marker); // add marker to temporary array if needs to coregate
+                        markers.push(marker); // add marker to array if needs to coregate
                             google.maps.event.addListener(marker, "click", (function(marker, i) { // if pointer is clicked show data in pop up box
                             return function() {
 
